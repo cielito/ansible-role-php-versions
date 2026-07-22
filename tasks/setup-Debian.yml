@@ -42,8 +42,6 @@
     ondrej_repo_signed_by: "{{ keyserver_response.content | regex_replace('\nComment.+\n','\n') }}"
   when: ansible_facts.distribution == "Ubuntu"
 
-- debug: var=ondrej_repo_signed_by
-
 - name: Set data for Ondrej's repo (Debian).
   ansible.builtin.set_fact:
     ondrej_repo_uri: "https://packages.sury.org/php"
@@ -63,7 +61,8 @@
   register: php_ondrej_debian_repo
 
 - name: Update apt caches after repo is added.
-  apt: update_cache=true
+  ansible.builtin.apt:
+    update_cache: true
   when:
     - php_ondrej_debian_repo.changed
     - ansible_facts.os_family == "Debian"
