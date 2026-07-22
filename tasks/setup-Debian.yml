@@ -1,10 +1,10 @@
 ---
 - name: Set the correct opcache filename (Ubuntu/Debian).
-  set_fact:
+  ansible.builtin.set_fact:
     php_opcache_conf_filename: "10-opcache.ini"
 
 - name: Add dependencies for PHP versions.
-  apt:
+  ansible.builtin.apt:
     name:
       - apt-transport-https
       - ca-certificates
@@ -13,7 +13,7 @@
 
 # Huge thanks to https://www.jeffgeerling.com/comment/34112#comment-34112
 - name: Make API request to Launchpad
-  uri:
+  ansible.builtin.uri:
     url: "https://api.launchpad.net/devel/~ondrej/+archive/ubuntu/php"
     return_content: true
     method: GET
@@ -27,7 +27,7 @@
     signing_key_fingerprint: "{{ launchpad_response.json.signing_key_fingerprint }}"
 
 - name: Retrieve ASCII representation of the key using the signing key fingerprint
-  uri:
+  ansible.builtin.uri:
     url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x{{ signing_key_fingerprint }}"
     return_content: true
     method: GET
@@ -70,7 +70,7 @@
   tags: ['skip_ansible_lint']
 
 - name: Purge PHP version packages (besides the currently chosen php_version).
-  apt:
+  ansible.builtin.apt:
     name: "{{ php_versions_debian | reject('search', 'php' ~ php_version) | list }}"
     state: absent
     purge: true
@@ -78,7 +78,7 @@
   register: php_version_purge
 
 - name: Also purge php-common package if any versions were just purged.
-  apt:
+  ansible.builtin.apt:
     name: php-common
     state: absent
     purge: true
